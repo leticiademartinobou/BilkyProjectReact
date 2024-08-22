@@ -10,52 +10,54 @@ const [error, setError] = useState(null)
 
 useEffect(() => {
 
-  const token = localStorage.getItem("token")
+  const fetchUserProfile = async () => {
   
-  if(!token) {
-    console.log("El token no está en el localStorage")
-    return setError("El token no está en el LocalStorage, haz log in otra vez")
-  }
+    const token = localStorage.getItem("token")
   
-  console.log("este es el token que consigo en el user profile", token)
-
-  const headers = {
-    "Content-Type": "application/json",
-    "Authorization" : Bearer ${token}
-  }
-
-  console.log("Estos son los headers, se están enviando:", headers);
-
-  fetch(${import.meta.env.VITE_APP_URL}/user/profile, {
-    method: "GET",
-    headers: headers,
-    
-  })
-  .then((response) => {
-    console.log("response recibida:", response)
-    if (!response.ok) {
-      return response.json().then((data) => {
-
-        throw new Error(data.message || 'Network response was not ok');
-      })
+    if(!token) {
+      console.log("El token no está en el localStorage")
+      return setError("El token no está en el LocalStorage, haz log in otra vez")
     }
-    return response.json();
-  })
-    .then((data) => {
-      if(data.success) {
+  
+    console.log("este es el token que consigo en el user profile", token)
 
-        setDocuments(data.data.documents);
-        console.log("data del usuario",data);
-      } else {
+    const headers = {
+      "Content-Type": "application/json",
+      "Authorization" : Bearer ${token}
+    }
+
+    console.log("Estos son los headers, se están enviando:", headers);
+
+  try{
+      const fetchResponse = await fetch(${import.meta.env.VITE_APP_URL}/user/profile, {
+      method: "GET",
+      headers: headers,
+      })
+
+  console.log("response reibida", fetchResponse)
+    
+      if (!fetchResponse.ok) {
+        const data = await fetchResponse.json():
+
+          throw new Error(data.message || 'La respuesta del fetch no es correcta');
+        }
+
+      const data = await response.json();
+    
+      if (data.success) {
+        setDocuments(data.data.documents)
+        console.log("documentos del usuario", data)
+      }else {
         console.log("Error consiguiendo la información del usuario", data.message)
         setError(data.message)
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.log("Este es el error del fetch", error)
       setError(error.message)
-    })
-}, [])
+    }
+  }
+    fetchUserProfile()
+  }, [])
 
 const handleUpdate = async () => {
  const token = localStorage.getItem("token")
