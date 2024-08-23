@@ -1,4 +1,4 @@
-Código app.jsx import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import './App.css';
 import './index.css';

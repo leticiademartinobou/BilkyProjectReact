@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { UpdateUserForm } from './UpdateUserForm';
+// import { UpdateUserForm } from './UpdateUserForm';
 
 export const UserProfile = ({ name, lastName, role}) =>{
   console.log("UserProfile Props", {name, lastName})
@@ -23,13 +23,13 @@ useEffect(() => {
 
     const headers = {
       "Content-Type": "application/json",
-      "Authorization" : Bearer ${token}
+      "Authorization" : `Bearer ${token}`
     }
 
     console.log("Estos son los headers, se están enviando:", headers);
 
   try{
-      const fetchResponse = await fetch(${import.meta.env.VITE_APP_URL}/user/profile, {
+      const fetchResponse = await fetch(`${import.meta.env.VITE_APP_URL}/user/profile`, {
       method: "GET",
       headers: headers,
       })
@@ -37,7 +37,7 @@ useEffect(() => {
   console.log("response reibida", fetchResponse)
     
       if (!fetchResponse.ok) {
-        const data = await fetchResponse.json():
+        const data = await fetchResponse.json();
 
           throw new Error(data.message || 'La respuesta del fetch no es correcta');
         }
@@ -61,7 +61,7 @@ useEffect(() => {
 
 const handleUpdate = async () => {
  const token = localStorage.getItem("token")
- const response = await fetch(${import.meta.env.VITE_APP_URL}/user/update, {
+ const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/update`, {
   method: "PUT", 
   headers: {
     "Content-Type" : "application/json", 
