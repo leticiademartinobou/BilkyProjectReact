@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Link } from 'react-router-dom';
 import "./styles.css";
 
-// const { name, lastName, age, email, nif, password, role }
-
 export const RegisterUser = () => {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -17,29 +15,43 @@ export const RegisterUser = () => {
     event.preventDefault();
 
     let userData = {
-      // se puede poner sólo el nombre porque son iguales
-      name: name,
-      lastName: lastName,
-      age: age,
-      email: email,
-      nif:nif,
-      password: password,
-      role: role,
+      name,
+      lastName,
+      age,
+      email,
+      nif,
+      password,
+      role,
     };
 
-    // poner el fetch con vble de entorno
+    console.log("VITE_APP_URL:", import.meta.env.VITE_APP_URL);
 
     fetch(`${import.meta.env.VITE_APP_URL}/user/register`, {
-      method: "post",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     })
-      .then((response) => response.json())
-      .then((data) => {
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text(); // Cambiado a text() para verificar el contenido antes de parsear
+    })
+    .then((text) => {
+      try {
+        const data = JSON.parse(text);
         console.log(data);
-      });
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        console.log("Response text:", text);
+      }
+    })
+    .catch((error) => {
+      console.error("Error during fetch:", error);
+    });
+
     console.log("botón submit", "Clicked");
   }
 
@@ -48,11 +60,9 @@ export const RegisterUser = () => {
       <div className="bg-white p-8 rounded shadow-md w-full max-w-4xl">
         <h1 className="mb-4 text-4xl min-w-64 font-semibold text-center">Regístrese en nuestra página</h1>
 
-        <form action="POST">
+        <form onSubmit={handleForm}>
           <div className="flex flex-wrap -mx-4">
             <div className="w-full md:w-1/2 px-4 mb-4">
-            {/* flex y flex-wrap para crear una disposición de dos columnas en pantallas medianas y más grandes (md:w-1/2). 
-            Para pantallas pequeñas, cada campo ocupa toda la anchura (w-full) */}
               <label className="block mb-2 text-xl font-medium text-gray-700">Nombre</label>
               <div className="flex items-center border border-blue-600 p-2 rounded">
                 <input
@@ -144,7 +154,7 @@ export const RegisterUser = () => {
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="Seleccione su Rol"
               >
-                <option value="" disabled selected hidden>
+                <option value="" disabled hidden>
                   Seleccione su Rol
                 </option>
                 <option value="admin">Admin</option>
@@ -163,11 +173,10 @@ export const RegisterUser = () => {
             </div>
           </div>
 
-          <input
+          <input 
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
             type="submit"
-            onClick={handleForm}
-            name="register-form"
+            value="Registrar"
           />
           <div className="text-black mt-4 text-center text-sm p-6">
               <p>¿Ya tienes cuenta? <Link to="/login" className="text-blue-600 cursor-pointer">Login</Link></p>
