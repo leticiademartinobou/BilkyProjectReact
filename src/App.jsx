@@ -87,10 +87,10 @@ function App() {
           <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
           {/* <Route path='/register' element = {< RegisterPage />}/> */}
           {/* <Route path='/login' element = {< LoginPage />}/> */}
-           <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}>
+           {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
           {/* aquí paso la prop isLoggedIn a protected route */}
             <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
-          </Route>
+          {/* </Route> */}
           <Route path='*' element={<Navigate to="/" />}/>
 
         </Routes>
