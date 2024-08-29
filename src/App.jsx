@@ -8,6 +8,7 @@ import { LoginUser } from './components/LoginUser';
 import UserProfile from './components/UserProfile';
 import ProtectedRoute from './ProtectedRoute';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { UpdateUserForm } from "./components/UpdateUserForm"
 // import  RegisterPage  from './pages/RegisterPage';
 // import  LoginPage  from './pages/LoginPage';
 
@@ -90,6 +91,7 @@ function App() {
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
           {/* aquí paso la prop isLoggedIn a protected route */}
             <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
+            <Route path='/update-user' element={<UpdateUserForm />} />
           {/* </Route> */}
           <Route path='*' element={<Navigate to="/" />}/>
 

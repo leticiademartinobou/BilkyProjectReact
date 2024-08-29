@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-// import { UpdateUserForm } from './UpdateUserForm';
+import UpdateUserForm from './UpdateUserForm';
+
 
 export const UserProfile = ({ name, lastName, role}) =>{
   console.log("UserProfile Props", {name, lastName})
@@ -105,6 +106,8 @@ const handleDelete = () => {
           ) : (
             <p>No documents available</p>
           )}
+
+
           {role === "admin" && <UpdateUserForm />
 
             // <div>
