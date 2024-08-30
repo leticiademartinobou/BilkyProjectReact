@@ -8,13 +8,23 @@ export const UpdateUserForm = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`/api/users/email/${email}`);
-      console.log(response);
-      console.log(response.data);
-      setUser(response.data);
+
+
+        const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+        const response = await axios.get(`${import.meta.env.VITE_APP_URL}/user/email/${email}`, {
+            headers: {
+            Authorization: `Bearer ${token}`      
+        }
+        });
+
+        console.log("respuesta completa",response);
+        console.log("esta es la data", response.data);
+        setUser(response.data);
+
     } catch (error) {
-      console.error('User not found', error);
-      alert("El usuario no existe en la base de datos");
+
+        console.error('User not found', error);
+        alert("El usuario no existe en la base de datos");
     }
   };
 
@@ -27,11 +37,18 @@ export const UpdateUserForm = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await axios.put(`/api/users/update`, {
-        email,
-        ...updatedData,
-      });
-      console.log('User updated successfully:', response.data);
+        const token = localStorage.getItem('token'); // Retrieve the token from storage
+        const response = await axios.put(`${import.meta.env.VITE_APP_URL}/user/update`, {
+          email,
+          ...updatedData,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}` // Include the token in the Authorization header
+          }
+        });
+
+      console.log('Usuario actualizado correctamente:', response.data);
+      
     } catch (error) {
       console.error('Error updating user', error);
       alert("Se ha producido un error, no se ha podido actualizar");
@@ -60,6 +77,11 @@ export const UpdateUserForm = () => {
       {user && (
         <div className="mt-6">
           <h3 className="text-xl font-semibold mb-4">
+            {console.log("este es el nombre del usuario", user.name)}
+            {console.log("este es el apellido del usuario", user.lastName)}
+            {console.log("este es la info del usuario", user)}
+
+
             Se ha encontrado a {user.name} {user.lastName}
           </h3>
           <div className="mb-4">
