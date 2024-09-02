@@ -48,7 +48,7 @@ useEffect(() => {
     
       if (data.success) {
         setDocuments(data.data.documents)
-        console.log("documentos del usuario", data)
+        console.log("documentos del usuario", data.data.documents)
       }else {
         console.log("Error consiguiendo la información del usuario", data.message)
         setError(data.message)
