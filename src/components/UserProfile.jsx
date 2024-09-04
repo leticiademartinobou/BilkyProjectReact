@@ -38,6 +38,7 @@ useEffect(() => {
 
       console.log("response reibida", fetchResponse)
     
+    
       if (!fetchResponse.ok) {
         const data = await fetchResponse.json();
 
@@ -45,10 +46,17 @@ useEffect(() => {
         }
 
       const data = await fetchResponse.json();
+      console.log("Datos recibidos de la API:", data);
     
       if (data.success) {
-        setDocuments(data.data.documents)
-        console.log("documentos del usuario", data.data.documents)
+        if (Array.isArray(data.data.documents)) {
+          setDocuments(data.data.documents);
+          console.log("Documentos del usuario recibidos", data.data.documents);
+        } else {
+          console.error("Los documentos no tienen el formato esperado", data.data.documents);
+          setError("Error en el formato de los documentos recibidos");
+        }
+
       }else {
         console.log("Error consiguiendo la información del usuario", data.message)
         setError(data.message)
@@ -87,40 +95,31 @@ const handleDelete = () => {
  // poner la lógica del delete
 }
   
-  return (
-      <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg bg-gray-100">
-        {/* <div className="bg-white p-8 rounded shadow-md w-full max-w-md"> */}
-          <h1 className="text-3xl md:text-5xl font-bold text-center break-words mb-4">Hola, {name} {lastName} tu rol es {role} </h1>
-          <p className="mt-4 text-center text-black">Welcome, to your profile page!</p>
-          <div className='mt-4'>
-          <h2 className='text-2xl font-bold'>Documents</h2>
-          {error && <p className='text-red-500'>{error}</p>}
-          {documents.length > 0 ? (
-            <ul>
-              {documents.map((document) => (
-                <li key={document._id}>
-                  {document.name} - {document.description}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No documents available</p>
-          )}
-
-
-          {role === "admin" && <UpdateUserForm />
-
-            // <div>
-            //   <button onClick={handleUpdate}> Update User </button>
-            //   <button onClick={handleDelete}> Delete User </button>
-
-            // </div>
-          }
-          </div>
-        </div>
-      // </div>
-    );
-  };
+return (
+  <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg bg-gray-100">
+    <h1 className="text-3xl md:text-5xl font-bold text-center break-words mb-4">
+      Hola, {name} {lastName} tu rol es {role}
+    </h1>
+    <p className="mt-4 text-center text-black">Welcome, to your profile page!</p>
+    <div className='mt-4'>
+      <h2 className='text-2xl font-bold'>Documents</h2>
+      {error && <p className='text-red-500'>{error}</p>}
+      {Array.isArray(documents) && documents.length > 0 ? (
+        <ul>
+          {documents.map((document) => (
+            <li key={document._id}>
+              {document.name ? document.name : "No name"} - {document.description ? document.description : "No description"}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No documents available</p>
+      )}
+      {role === "admin" && <UpdateUserForm />}
+    </div>
+  </div>
+);
+};
 
 
 export default UserProfile
