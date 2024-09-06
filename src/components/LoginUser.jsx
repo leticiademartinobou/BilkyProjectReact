@@ -85,7 +85,7 @@ export const LoginUser = ( {updateStatus}) => {
             </button>
             <div className="text-black mt-4 text-center text-sm p-6">
               <p className="mb-4">¿No tienes una cuenta? <Link to="/register" className="text-blue-600 cursor-pointer">Register</Link></p>
-              <p className="mb-12">¿Has olvidado tu contraseña? <Link to="/" className="text-blue-600 cursor-pointer">Recupera tu contraseña</Link></p>
+              <p className="mb-12">¿Has olvidado tu contraseña? <Link to="/recuperate-password" className="text-blue-600 cursor-pointer">Recupera tu contraseña</Link></p>
               <p >Más información en <Link to="/" className="text-blue-600 cursor-pointer">Home</Link></p>
               {/* mb-4" a los párrafos para agregar un margen inferior de 1rem entre las líneas. 
               Esto proporciona espacio vertical entre cada párrafo. */}

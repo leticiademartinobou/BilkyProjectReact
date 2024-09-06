@@ -7,6 +7,7 @@ import { LoginUser } from './components/LoginUser';
 import UserProfile from './components/UserProfile';
 import ProtectedRoute from './ProtectedRoute';
 import { UpdateUserForm } from "./components/UpdateUserForm"
+import { RecuperatePassword } from "./components/RecuperatePassword"
 import './App.css';
 import './index.css';
 // import  RegisterPage  from './pages/RegisterPage';
@@ -86,6 +87,7 @@ function App() {
           <Route path='/' element={<Home />}/>
           <Route path='/register' element={<RegisterUser />}/>
           <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
+          <Route path="/recuperate-password" element={<RecuperatePassword />} />
           {/* <Route path='/register' element = {< RegisterPage />}/> */}
           {/* <Route path='/login' element = {< LoginPage />}/> */}
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
