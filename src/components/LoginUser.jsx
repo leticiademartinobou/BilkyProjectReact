@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaLock, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import RecuperatePassword from "./RecuperatePassword";
 // import { MdMail } from "react-icons/md";
 // import PropTypes from 'prop-types';
 

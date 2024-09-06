@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import './App.css';
-import './index.css';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Home from './components/Home';
 import { RegisterUser } from './components/RegisterUser';
 import { LoginUser } from './components/LoginUser';
 import UserProfile from './components/UserProfile';
 import ProtectedRoute from './ProtectedRoute';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { UpdateUserForm } from "./components/UpdateUserForm"
+import './App.css';
+import './index.css';
 // import  RegisterPage  from './pages/RegisterPage';
 // import  LoginPage  from './pages/LoginPage';
 
