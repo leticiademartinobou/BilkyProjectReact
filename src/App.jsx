@@ -87,7 +87,7 @@ function App() {
           <Route path='/' element={<Home />}/>
           <Route path='/register' element={<RegisterUser />}/>
           <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
-          <Route path="/recuperate-password" element={<RecuperatePassword />} />
+          <Route path="/resetPassword/:token" element={<RecuperatePassword />} />
           {/* <Route path='/register' element = {< RegisterPage />}/> */}
           {/* <Route path='/login' element = {< LoginPage />}/> */}
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}

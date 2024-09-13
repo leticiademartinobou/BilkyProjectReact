@@ -39,8 +39,8 @@ export const RecuperatePassword = () => {
     const handlePasswordReset = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/resetPassword`, {
-                method:POST, 
+            const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/resetPassword/${token}`, {
+                method:"POST", 
                 headers: {
                     "Content-Type" : "application/json",
                 },
