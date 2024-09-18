@@ -1,10 +1,10 @@
 // import { Outlet, Navigate } from "react-router-dom"
-import { Navigate } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 // import PropTypes from 'prop-types';
 
 
-const ProtectedRoute = ({ isLoggedIn, children }) => {
-// const ProtectedRoute = ({ isLoggedIn }) => {
+const PrivateRoutes = ({ isLoggedIn, children }) => {
+// const PrivateRoutes = ({ isLoggedIn }) => {
 
   console.log("esta es la ProtectedRoute isLoggedIn",isLoggedIn)
   
@@ -17,7 +17,7 @@ const ProtectedRoute = ({ isLoggedIn, children }) => {
 //   isLoggedIn: PropTypes.bool.isRequired,
 //   // children: PropTypes.bool.isRequired,
 // };
-export default ProtectedRoute
+export default PrivateRoutes
 
   //(
     // <div>

@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import Home from './components/Home';
-import { RegisterUser } from './components/RegisterUser';
-import { LoginUser } from './components/LoginUser';
-import UserProfile from './components/UserProfile';
-import ProtectedRoute from './ProtectedRoute';
-import { UpdateUserForm } from "./components/UpdateUserForm"
-import { RecuperatePassword } from "./components/RecuperatePassword"
 import './App.css';
+import Home from './components/Home';
+import { LoginUser } from './components/LoginUser';
+import { RecuperatePassword } from "./components/RecuperatePassword";
+import { RegisterUser } from './components/RegisterUser';
+import { UpdateUserForm } from "./components/UpdateUserForm";
+import UserProfile from './components/UserProfile';
 import './index.css';
+import ResetPassword from './components/ResetPassword';
 // import  RegisterPage  from './pages/RegisterPage';
 // import  LoginPage  from './pages/LoginPage';
 
@@ -87,9 +87,17 @@ function App() {
           <Route path='/' element={<Home />}/>
           <Route path='/register' element={<RegisterUser />}/>
           <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
-          <Route path="/resetPassword/:token" element={<RecuperatePassword />} />
-          {/* <Route path='/register' element = {< RegisterPage />}/> */}
-          {/* <Route path='/login' element = {< LoginPage />}/> */}
+
+          {/* Ruta para solicitar la recuperación de la contraseña (sin token) */}
+          <Route path='/recuperate-password' element={<RecuperatePassword />}/>
+
+          Ruta para cambiar la contrasña con el token
+          <Route path='/reset-password/:token' element={<ResetPassword />}/>
+
+
+          {/* Ruta para restrablecer la contraseña usando el token */}
+          {/* <Route path="/resetPassword/:token" element={<RecuperatePassword />} /> */}
+   
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
           {/* aquí paso la prop isLoggedIn a protected route */}
             <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
