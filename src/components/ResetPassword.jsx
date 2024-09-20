@@ -2,12 +2,17 @@ import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 export const ResetPassword = () => {
+
+    console.log("Componente ResetPassword montado");
+
     
     const { token } = useParams(); // leo el token de la url
-    const [ newPassword, setNetPassword] = useState("")
+    const [ newPassword, setNewPassword] = useState("")
     const [ confirmPassword, setConfirmPassword ] = useState("")
     const [ error, setError ] = useState(null)
-    const navigate = useNavigate
+    const navigate = useNavigate();
+    
+    console.log("Token recibido:", token);
 
     const handleSubmit = async (e) => {
 
@@ -44,6 +49,7 @@ export const ResetPassword = () => {
         } catch (error) {
 
             setError("Error al actualizar la contraseña, por favor inténtelo de nuevo")
+            console.log("error al actualizar la contraseña", error)
         }
 
     }
@@ -61,7 +67,7 @@ export const ResetPassword = () => {
                         className="border border-blue-600 p-2 w-full rounded" 
                         type="password"
                         value={newPassword}
-                        onChange={(e) => setNetPassword(e.target.value)}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Introduce tu nueva contraseña"
                         required   
                         />
