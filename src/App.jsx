@@ -101,8 +101,8 @@ function App() {
    
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
           {/* aquí paso la prop isLoggedIn a protected route */}
-            <PrivateRoutes path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
-            <PrivateRoutes path='/update-user' element={<UpdateUserForm />} />
+            <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
+            <Route path='/update-user' element={<UpdateUserForm />} />
           {/* </Route> */}
           <Route path='*' element={<Navigate to="/" />}/>
 
