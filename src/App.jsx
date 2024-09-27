@@ -10,6 +10,7 @@ import { RegisterUser } from './components/RegisterUser';
 import { UpdateUserForm } from "./components/UpdateUserForm";
 import UserProfile from './components/UserProfile';
 import ResetPassword from './components/ResetPassword';
+import PrivateRoutes from './PrivateRoutes';
 // import  RegisterPage  from './pages/RegisterPage';
 // import  LoginPage  from './pages/LoginPage';
 
@@ -91,7 +92,7 @@ function App() {
           {/* Ruta para solicitar la recuperación de la contraseña (sin token) */}
           <Route path='/recuperate-password' element={<RecuperatePassword />}/>
 
-          Ruta para cambiar la contrasña con el token
+          {/* Ruta para cambiar la contrasña con el token */}
           <Route path='/reset-password/:token' element={<ResetPassword />}/>
 
 
@@ -100,8 +101,8 @@ function App() {
    
            {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
           {/* aquí paso la prop isLoggedIn a protected route */}
-            <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
-            <Route path='/update-user' element={<UpdateUserForm />} />
+            <PrivateRoutes path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
+            <PrivateRoutes path='/update-user' element={<UpdateUserForm />} />
           {/* </Route> */}
           <Route path='*' element={<Navigate to="/" />}/>
 

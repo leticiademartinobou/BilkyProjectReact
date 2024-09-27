@@ -1,24 +1,32 @@
 // import { Outlet, Navigate } from "react-router-dom"
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Route } from "react-router-dom"
 // import PropTypes from 'prop-types';
 
 
-const PrivateRoutes = ({ isLoggedIn, children }) => {
-// const PrivateRoutes = ({ isLoggedIn }) => {
+const PrivateRoutes = ({ component: Component, ...rest }) => {
 
-  console.log("esta es la ProtectedRoute isLoggedIn",isLoggedIn)
-  
-  return isLoggedIn ? children : <Navigate to="/" />
-  // return isLoggedIn ? <Outlet /> : <Navigate to="/" />
+const isAuthenticated = !!localStorage.getItem("token") // compuebo si existe el token
 
+return (
+  <Route 
+    {...rest}
+    render={(props) => 
+      isAuthenticated ? (
+        <Component {...props}/>
+      ) : (
+        <Navigate to="/login"/>
+      )
+    }
+  />
+  )
 }
+export default PrivateRoutes
+
 
 // ProtectedRoute.propTypes = {
 //   isLoggedIn: PropTypes.bool.isRequired,
 //   // children: PropTypes.bool.isRequired,
 // };
-export default PrivateRoutes
-
   //(
     // <div>
     //     {isLoggedIn ? children : <Navigate to="/" />}

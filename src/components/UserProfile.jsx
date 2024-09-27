@@ -38,6 +38,7 @@ useEffect(() => {
 
       console.log("response reibida", fetchResponse)
     
+      const data = await fetchResponse.json();
     
       if (!fetchResponse.ok) {
         const data = await fetchResponse.json();
@@ -45,7 +46,6 @@ useEffect(() => {
           throw new Error(data.message || 'La respuesta del fetch no es correcta');
         }
 
-      const data = await fetchResponse.json();
       console.log("Datos recibidos de la API:", data);
     
       if (data.success) {
@@ -53,7 +53,7 @@ useEffect(() => {
           setDocuments(data.data.documents);
           console.log("Documentos del usuario recibidos", data.data.documents);
         } else {
-          console.error("Los documentos no tienen el formato esperado", data.data.documents);
+          console.log("Los documentos no tienen el formato esperado", data.data.documents);
           setError("Error en el formato de los documentos recibidos");
         }
 
@@ -75,7 +75,7 @@ const handleUpdate = async () => {
   method: "PUT", 
   headers: {
     "Content-Type" : "application/json", 
-    "token" : token,
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({email, newEmail, password }),
  });
