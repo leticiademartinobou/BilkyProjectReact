@@ -1,26 +1,40 @@
 // import { Outlet, Navigate } from "react-router-dom"
-import { Navigate, Route } from "react-router-dom"
+import { Navigate, Route, Outlet } from "react-router-dom"
 // import PropTypes from 'prop-types';
 
 
-const PrivateRoutes = ({ component: Component, ...rest }) => {
+const PrivateRoutes = ({ isLoggedIn }) => {
 
-const isAuthenticated = !!localStorage.getItem("token") // compuebo si existe el token
+  return isLoggedIn ? <Outlet /> : <Navigate to = "/login" />
+  
+};
 
-return (
-  <Route 
-    {...rest}
-    render={(props) => 
-      isAuthenticated ? (
-        <Component {...props}/>
-      ) : (
-        <Navigate to="/login"/>
-      )
-    }
-  />
-  )
-}
 export default PrivateRoutes
+
+
+
+
+
+
+
+// const PrivateRoutes = ({ component: Component, ...rest }) => {
+
+// const isAuthenticated = !!localStorage.getItem("token") // compuebo si existe el token
+
+// return (
+//   <Route 
+//     {...rest}
+//     render={(props) => 
+//       isAuthenticated ? (
+//         <Component {...props}/>
+//       ) : (
+//         <Navigate to="/login"/>
+//       )
+//     }
+//   />
+//   )
+// }
+// export default PrivateRoutes
 
 
 // ProtectedRoute.propTypes = {

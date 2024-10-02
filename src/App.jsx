@@ -99,11 +99,11 @@ function App() {
           {/* Ruta para restrablecer la contraseña usando el token */}
           {/* <Route path="/resetPassword/:token" element={<RecuperatePassword />} /> */}
    
-           {/* <Route element={<ProtectedRoute isLoggedIn={isLoggedIn}/>}> */}
+           <Route element={<PrivateRoutes isLoggedIn={isLoggedIn}/>}>
           {/* aquí paso la prop isLoggedIn a protected route */}
-            <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />}/>
+            <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />} />
             <Route path='/update-user' element={<UpdateUserForm />} />
-          {/* </Route> */}
+          </Route>
           <Route path='*' element={<Navigate to="/" />}/>
 
         </Routes>
