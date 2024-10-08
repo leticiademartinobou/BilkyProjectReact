@@ -62,7 +62,7 @@ function App() {
         setRole(decodedToken.role)
         setIsLoggedIn(true);
         
-        localStorage.setItem("token", token); // Store token
+        localStorage.setItem("token", token); // si todo bien, guardo el token en localStorage
         console.log("Logged In Status:", true);
         
       } catch (error) {

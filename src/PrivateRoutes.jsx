@@ -1,7 +1,6 @@
 // import { Outlet, Navigate } from "react-router-dom"
-import { Navigate, Route, Outlet } from "react-router-dom"
 // import PropTypes from 'prop-types';
-
+import { Navigate, Route, Outlet } from "react-router-dom"
 
 const PrivateRoutes = ({ isLoggedIn }) => {
 
