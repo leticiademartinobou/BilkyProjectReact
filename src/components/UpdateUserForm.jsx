@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export const UpdateUserForm = () => {
@@ -6,24 +6,32 @@ export const UpdateUserForm = () => {
   const [user, setUser] = useState(null);
   const [updatedData, setUpdatedData] = useState({});
 
+
   const handleSearch = async () => {
     try {
 
-
         const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
+        console.log("este es el email que estás intentando actualizar en react", email)
+
         const response = await axios.get(`${import.meta.env.VITE_APP_URL}/user/email/${email}`, {
             headers: {
             Authorization: `Bearer ${token}`      
         }
         });
 
-        console.log("respuesta completa",response);
-        console.log("esta es la data", response.data);
-        setUser(response.data);
+        if(response && response.data) {
+
+          console.log("respuesta completa",response);
+          console.log("esta es la data del usuario", response.data);
+          setUser(response.data.data);
+          // console.log("Estos son los datos de setUser", user)
+        } else {
+          console.log("no se ha encontrado el usuario o la response.data está vacía")
+        }
 
     } catch (error) {
 
-        console.error('User not found', error);
+        console.log('User not found', error);
         alert("El usuario no existe en la base de datos");
     }
   };
@@ -38,6 +46,9 @@ export const UpdateUserForm = () => {
   const handleUpdate = async () => {
     try {
         const token = localStorage.getItem('token'); // Retrieve the token from storage
+
+        console.log("este es el email que se busca para actualizar", email)
+
         const response = await axios.put(`${import.meta.env.VITE_APP_URL}/user/update`, {
           email,
           ...updatedData,
@@ -47,7 +58,9 @@ export const UpdateUserForm = () => {
           }
         });
 
-      console.log('Usuario actualizado correctamente:', response.data);
+        console.log("respuesta de la API", response)
+
+        console.log('Usuario actualizado correctamente:', response.data);
       
     } catch (error) {
       console.error('Error updating user', error);
@@ -76,13 +89,14 @@ export const UpdateUserForm = () => {
 
       {user && (
         <div className="mt-6">
+          {/* {console.log("datos del user", user)} */}
           <h3 className="text-xl font-semibold mb-4">
             {console.log("este es el nombre del usuario", user.name)}
             {console.log("este es el apellido del usuario", user.lastName)}
             {console.log("este es la info del usuario", user)}
 
 
-            Se ha encontrado a {user.name} {user.lastName}
+            Se ha encontrado a {user.name || "Nombre desconocido"} {user.lastName || "Apellido desconocido"}
           </h3>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
@@ -91,6 +105,7 @@ export const UpdateUserForm = () => {
             <input
               type="text"
               name="name"
+              // value={updatedData.name || user.name} // aquí muestro el valor actualizado o el original
               placeholder={user.name}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black"
@@ -103,6 +118,7 @@ export const UpdateUserForm = () => {
             <input
               type="text"
               name="lastName"
+              // value={updatedData.lastName || user.lastName}
               placeholder={user.lastName}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black"
@@ -115,6 +131,7 @@ export const UpdateUserForm = () => {
             <input
               type="text"
               name="role"
+              // value={updatedData.role || user.role}
               placeholder={user.role}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black"
