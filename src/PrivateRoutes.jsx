@@ -10,6 +10,11 @@ const PrivateRoutes = ({ isLoggedIn }) => {
 
 export default PrivateRoutes
 
+// Outlet: Un componente de react-router-dom que representa un punto
+// de inserción para los componentes secundarios. 
+// Es decir, Outlet se usa para representar los componentes hijos anidados en una ruta.
+
+
 
 
 
@@ -59,6 +64,3 @@ export default PrivateRoutes
 // Si isLoggedIn es true, ProtectedRoute renderiza children (los componentes hijos).
 // Si isLoggedIn es false, ProtectedRoute redirige al usuario a la página principal (/) usando Navigate.
 
-// Outlet: Un componente de react-router-dom que representa un punto
-// de inserción para los componentes secundarios. 
-// Es decir, Outlet se usa para representar los componentes hijos anidados en una ruta.

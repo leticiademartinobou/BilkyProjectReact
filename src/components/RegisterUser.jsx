@@ -1,35 +1,37 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./styles.css"
 
 export const RegisterUser = () => {
 
   const { register, handleSubmit, watch ,formState: { errors } } = useForm(); // aquí inicializo useForm y desestructuro errores
   const [role, setRole] = useState("")
-
-    // Observamos el campo de contraseña para compararlo con la confirmación
+  const navigate = useNavigate(); // hago esto para inicializar useNavigate aquí
 
   // hago una función para manerjar el envío del formulario
 
-  const onSubmit = (data) => {
-    console.log("Datos del formulario", data)
+  const onSubmit = (formUserData) => {
+    console.log("Datos del formulario", formUserData)
 
     fetch(`${import.meta.env.VITE_APP_URL}/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(formUserData),
     })
-    .then((response) => {
-      if(!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+    .then((fetchResponse) => {
+      if(!fetchResponse.ok) {
+        throw new Error(`HTTP error! status: ${fetchResponse.status}`)
       }
-      return response.json(); // parseo la response a json
+      return fetchResponse.json(); // parseo la response a json
     })
-    .then((data) => {
-      console.log("respuesta del servidor", data)
+    .then((formUserData) => {
+      console.log("respuesta del servidor", formUserData)
+      if(formUserData.success) {
+        navigate("/profile"); // si se ha hecho el register ok, ve al profile del user
+      }
     })
     .catch((error) => {
       console.log("este es el error que ha ocurrido durante el fetch", error)
