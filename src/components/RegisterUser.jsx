@@ -3,16 +3,17 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles.css"
 
-export const RegisterUser = () => {
+export const RegisterUser = ( { updateStatus }) => {
 
   const { register, handleSubmit, watch ,formState: { errors } } = useForm(); // aquí inicializo useForm y desestructuro errores
-  const [role, setRole] = useState("")
+  const [role, setRole] = useState("");
+  const [message, setMessage] = useState("") // aquí quiero manejar el mensaje de respuesta cuando me registre o no
   const navigate = useNavigate(); // hago esto para inicializar useNavigate aquí
 
   // hago una función para manerjar el envío del formulario
 
   const onSubmit = (formUserData) => {
-    console.log("Datos del formulario", formUserData)
+    // console.log("Datos del formulario", formUserData)
 
     fetch(`${import.meta.env.VITE_APP_URL}/user/register`, {
       method: "POST",
@@ -27,14 +28,31 @@ export const RegisterUser = () => {
       }
       return fetchResponse.json(); // parseo la response a json
     })
-    .then((formUserData) => {
-      console.log("respuesta del servidor", formUserData)
-      if(formUserData.success) {
+    .then((serverData) => {
+      console.log("respuesta del servidor", serverData)
+      if(serverData.token) {
+
+        //Aquí lo que hago es que llamo a updateStatus para que guarde el token en el localStorage y actualice el estado
+        updateStatus(serverData.token)
         navigate("/profile"); // si se ha hecho el register ok, ve al profile del user
+        setMessage("Usuario creado correctamente")
+        console.log("esta es la info del mensaje",serverData.message)
+        console.log(serverData)
+        
+      } else if(serverData.message === "El email ya existe en la base de datos, utilice otro email o recupere su contraseña") {
+        //respuesta si el usuario existe en la BBDD
+        // console.log(serverData.message)
+
+        setMessage("El email ya existe en la base de datos, utilice otro email para registrarse")
+      } else {
+        setMessage("Ha ocurrido un error inténtelo de nuevo")
+        console.log("Error inesperado", serverData.message)
+
       }
     })
     .catch((error) => {
       console.log("este es el error que ha ocurrido durante el fetch", error)
+      setMessage("Error del servidor, inténtelo de nuevo")
     });
   };
 
@@ -48,6 +66,14 @@ export const RegisterUser = () => {
     <div className="h-screen min-w-180 flex items-center justify-center bg-gray-100 overflow-auto">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-4xl">
         <h1 className="mb-4 text-4xl min-w-64 font-semibold text-center">Regístrese en nuestra página</h1>
+
+        {/* Aqui quiero mostrar los mensajes de error o de éxito en el DOM  */}
+
+        { message && (
+          <div className={`mb-4 text-center p-3 rounded ${message.toLowerCase().includes("correctamente")? "bg-green-100 text-green-500" : "bg-red-100 text-red-500"}`}>
+            {message}
+          </div>
+        )}
 
         {/* Ahora paso al handleSubmit y a la función onSubmit a form */}
 
@@ -178,7 +204,7 @@ export const RegisterUser = () => {
                   Seleccione su Rol
                 </option>
                 <option value="admin">Admin</option>
-                <option value="user">User</option>
+                {/* <option value="user">User</option> */} 
               </select>
               {errors.role && <p className="text-red-500">{errors.role.message}</p>}
             </div>

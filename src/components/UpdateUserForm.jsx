@@ -5,13 +5,13 @@ export const UpdateUserForm = () => {
   const [email, setEmail] = useState('');
   const [user, setUser] = useState(null);
   const [updatedData, setUpdatedData] = useState({});
+  const [message, setMessage] = useState("")
 
 
   const handleSearch = async () => {
     try {
 
         const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
-        console.log("este es el email que estás intentando actualizar en react", email)
 
         const response = await axios.get(`${import.meta.env.VITE_APP_URL}/user/email/${email}`, {
             headers: {
@@ -19,20 +19,21 @@ export const UpdateUserForm = () => {
         }
         });
 
-        if(response && response.data) {
+        if(response && response.data && response.data.data) {
 
-          console.log("respuesta completa",response);
-          console.log("esta es la data del usuario", response.data);
           setUser(response.data.data);
-          // console.log("Estos son los datos de setUser", user)
+          setMessage("") // con esto quito los mensajes anteriores
         } else {
           console.log("no se ha encontrado el usuario o la response.data está vacía")
+          setUser(null)
+          setMessage("El usuario no existe en la base de datos")
         }
 
     } catch (error) {
-
+        setUser(null) // con esto me aseguro que el "user" se reinicia si no se encuentra a ningún user
+        setMessage("El usuario no existe en la base de datos")
         console.log('User not found', error);
-        alert("El usuario no existe en la base de datos");
+
     }
   };
 
@@ -57,20 +58,17 @@ export const UpdateUserForm = () => {
             Authorization: `Bearer ${token}` // Include the token in the Authorization header
           }
         });
-
-        console.log("respuesta de la API", response)
-
-        console.log('Usuario actualizado correctamente:', response.data);
       
     } catch (error) {
-      console.error('Error updating user', error);
-      alert("Se ha producido un error, no se ha podido actualizar");
+      console.log('Error updating user', error);
+      setMessage("Hubo un problema al actualizar el usuario")
     }
   };
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">Actualizar Usuario</h2>
+      
       <div className="mb-4">
         <input
           type="email"
@@ -87,14 +85,15 @@ export const UpdateUserForm = () => {
         Buscar Usuario
       </button>
 
+      {/* Quiero mostrar el mensaje de error o éxito */}
+
+      {message && <p  className="text-red-500" >{message}</p>}
+
+      {/* Sólo se muestra el formulario si se encuentra el usuario */}
+
       {user && (
         <div className="mt-6">
-          {/* {console.log("datos del user", user)} */}
           <h3 className="text-xl font-semibold mb-4">
-            {console.log("este es el nombre del usuario", user.name)}
-            {console.log("este es el apellido del usuario", user.lastName)}
-            {console.log("este es la info del usuario", user)}
-
 
             Se ha encontrado a {user.name || "Nombre desconocido"} {user.lastName || "Apellido desconocido"}
           </h3>
@@ -128,14 +127,17 @@ export const UpdateUserForm = () => {
             <label className="block text-sm font-medium text-gray-700">
               Rol:
             </label>
-            <input
-              type="text"
-              name="role"
-              // value={updatedData.role || user.role}
-              placeholder={user.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black"
-            />
+            <select
+            name="role"
+            onChange={handleChange}
+            defaultValue={user.role}
+            // placeholder={user.role}
+            className="w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black"
+            >
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+
           </div>
           <button
             onClick={handleUpdate}

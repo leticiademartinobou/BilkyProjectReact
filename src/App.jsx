@@ -26,7 +26,6 @@ function App() {
     if (token) {
       try {
         const decodedToken = jwtDecode(token)
-        console.log("Este es el token descodificado:", decodedToken);
         const currentTime = Date.now() / 1000; // más explicación
 
         //Hay que verificar si el token ha expirado
@@ -36,7 +35,6 @@ function App() {
           localStorage.removeItem("token")
           setIsLoggedIn(false) // para asegurarme que el usuario no hace log in sin token
         } else {
-          console.log("este es el token descodificado", decodedToken)
           setName(decodedToken.name)
           setLastName(decodedToken.lastName)
           setRole(decodedToken.role)
@@ -56,7 +54,6 @@ function App() {
     if(token) {
       try {
         const decodedToken = jwtDecode(token)
-        console.log("Decoded Token2:", decodedToken);
         setName(decodedToken.name)
         setLastName(decodedToken.lastName)
         setRole(decodedToken.role)
@@ -86,7 +83,7 @@ function App() {
         <Routes>
           {/* tengo qye poner un * que es donde te lleva por defecto */}
           <Route path='/' element={<Home />}/>
-          <Route path='/register' element={<RegisterUser />}/>
+          <Route path='/register' element={<RegisterUser updateStatus={updateStatus} />}/>
           <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
 
           {/* Ruta para solicitar la recuperación de la contraseña (sin token) */}

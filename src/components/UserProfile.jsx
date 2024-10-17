@@ -4,7 +4,7 @@ import UpdateUserForm from './UpdateUserForm';
 
 
 export const UserProfile = ({ name, lastName, role}) =>{
-  console.log("UserProfile Props", {name, lastName})
+ 
 
 const [documents, setDocuments] = useState([])
 const [error, setError] = useState(null)
@@ -14,29 +14,23 @@ useEffect(() => {
   const fetchUserProfile = async () => {
   
     const token = localStorage.getItem("token")
-    console.log("Token fetched from localStorage:", token);
+  
   
     if(!token) {
       console.log("El token no está en el localStorage")
       return setError("El token no está en el LocalStorage, haz log in otra vez")
     }
   
-    console.log("este es el token que consigo en el user profile", token)
-
     const headers = {
       "Content-Type": "application/json",
       "Authorization" : `Bearer ${token}`
     }
-
-    console.log("Estos son los headers, se están enviando:", headers);
 
   try{
       const fetchResponse = await fetch(`${import.meta.env.VITE_APP_URL}/user/profile`, {
       method: "GET",
       headers: headers,
       })
-
-      console.log("response reibida", fetchResponse)
     
       const data = await fetchResponse.json();
     
@@ -45,8 +39,6 @@ useEffect(() => {
 
           throw new Error(data.message || 'La respuesta del fetch no es correcta');
         }
-
-      console.log("Datos recibidos de la API:", data);
     
       if (data.success) {
         if (Array.isArray(data.data.documents)) {
