@@ -24,6 +24,8 @@ export const RegisterUser = ( { updateStatus }) => {
     })
     .then((fetchResponse) => {
       if(!fetchResponse.ok) {
+
+        // Manejo de error si la respuesta no es ok
         throw new Error(`HTTP error! status: ${fetchResponse.status}`)
       }
       return fetchResponse.json(); // parseo la response a json

@@ -15,7 +15,6 @@ import PrivateRoutes from './PrivateRoutes';
 // import  LoginPage  from './pages/LoginPage';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [name, setName] = useState('')
   const [lastName,setLastName] = useState('')
   const [role, setRole]  = useState('')
@@ -33,18 +32,16 @@ function App() {
         if( decodedToken.exp < currentTime) {
           console.log("token expirado, eliminando del localStorage")
           localStorage.removeItem("token")
-          setIsLoggedIn(false) // para asegurarme que el usuario no hace log in sin token
         } else {
           setName(decodedToken.name)
           setLastName(decodedToken.lastName)
           setRole(decodedToken.role)
-          setIsLoggedIn(true);
+          
         }
 
       } catch (error) {
         console.log("Invalid token", error)
         localStorage.removeItem("token")
-        setIsLoggedIn(false) // para asegurarme que el usuario no hace log in sin token
 
       }
     }
@@ -57,10 +54,8 @@ function App() {
         setName(decodedToken.name)
         setLastName(decodedToken.lastName)
         setRole(decodedToken.role)
-        setIsLoggedIn(true);
         
         localStorage.setItem("token", token); // si todo bien, guardo el token en localStorage
-        console.log("Logged In Status:", true);
         
       } catch (error) {
         console.log("failed to decode token", error)
@@ -96,8 +91,7 @@ function App() {
           {/* Ruta para restrablecer la contraseña usando el token */}
           {/* <Route path="/resetPassword/:token" element={<RecuperatePassword />} /> */}
    
-           <Route element={<PrivateRoutes isLoggedIn={isLoggedIn}/>}>
-          {/* aquí paso la prop isLoggedIn a protected route */}
+           <Route element={<PrivateRoutes/>}>
             <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />} />
             <Route path='/update-user' element={<UpdateUserForm />} />
           </Route>
@@ -115,7 +109,5 @@ function App() {
 
 export default App
 
-// Si isLoggedIn es true, renderiza children, que en este caso será el componente UserProfile.
 
-// Si isLoggedIn es false, redirige al usuario a la ruta raíz (/) utilizando Navigate.
 
