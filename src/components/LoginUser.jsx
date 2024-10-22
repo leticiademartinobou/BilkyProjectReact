@@ -62,10 +62,30 @@ export const LoginUser = ( {updateStatus}) => {
   
 
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex">
         {/* h-screen es 100vh */}
-        <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-          <h1 className="mb-4 text-4xl font-bold text-center">Log in</h1>
+
+        {/* Navbar Section del menu LogIn*/}
+
+        <nav className="w-full py-4 bg-white shadow-md fixed top-0 left-0">
+          <div className="container mx-auto flex justify-between items-center text-center max-w-7xl min-w-[800px]">
+            <div className="text-3xl text-blue-600 font-bold mr-4 ml-4">Bilky®</div>
+              <div className="space-x-8 text-lg font-semibold">
+                <Link to="/asesoria" className="text-gray-700 hover:text-blue-600">Soy Asesoría</Link>
+                <Link to="/empresa" className="text-gray-700 hover:text-blue-600">Soy Empresa</Link>
+                <Link to="/demo" className="text-gray-700 hover:text-blue-600">Demo</Link>
+                <Link to="/contacto" className="text-gray-700 hover:text-blue-600">Contacto</Link>
+                <Link to="/register" className="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Registrar</Link>
+                <Link to="/login" className="text-blue-600 border-2 border-blue-600 px-4 py-2 rounded hover:bg-blue-100">Acceder</Link>
+              </div>
+            </div>
+        </nav>
+        <div className="bg-white p-8 rounded shadow-md w-full max-w-md mt-8">
+          <div className='text-center'>
+            <p className="text-5xl text-blue-600 font-semibold mr-4 ml-4 mb-6">Bilky®</p>
+            <h1 className="mb-6 text-3xl font-bold text-center mr-4 ml-4 ">Acceder</h1>
+          </div>
+          <p className="mb-4 text-1xl text-center text-gray-400">Un portal único, Un único portal</p>
           <form onSubmit = {handleSubmit(handleForm)}> {/* Aquí utilizo handleSubmit de REactHook Form */}
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
@@ -117,24 +137,24 @@ export const LoginUser = ( {updateStatus}) => {
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
               type="submit"
             >
-              Submit
+              Iniciar sesión
             </button>
 
             <div className="text-black mt-4 text-center text-sm p-6">
-              <p className="mb-4">¿No tienes una cuenta? <Link to="/register" className="text-blue-600 cursor-pointer">Register</Link></p>
-              <p className="mb-12">¿Has olvidado tu contraseña? <Link to="/recuperate-password" className="text-blue-600 cursor-pointer">Recupera tu contraseña</Link></p>
-              <p >Más información en <Link to="/" className="text-blue-600 cursor-pointer">Home</Link></p>
-              {/* mb-4" a los párrafos para agregar un margen inferior de 1rem entre las líneas. 
-              Esto proporciona espacio vertical entre cada párrafo. */}
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  };
 
-  
+              <p className='mb-4'> ¿No tienes cuenta? <Link to = "/register" className='text-blue-600 cursor-pointer'>Register</Link></p>
+              <p className='mb-12'>¿Has olvidado tu contraseña? <Link to="/recuperate-password" className='text-red-600 cursor-pointer'>Recupera tu contraseña</Link></p>
+              <p>Más información en <Link to= "/" className='text-blue-600 cursor-pointer'>Home</Link></p>
+
+              </div>
+            </form>
+            </div>
+          </div>
+        );
+      };
+      
   export default LoginUser;
+              
   
   
 // explicaciones

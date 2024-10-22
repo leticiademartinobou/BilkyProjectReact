@@ -65,49 +65,39 @@ function App() {
       console.log("received undefined token")
     }
   };
-  // (prev) => !prev is a function that takes the previous 
-  // state value (prev) and returns the opposite value (!prev).
-  // tengo un estado que coge el valor prevío y lo cambia
 
-
-  return (
-    
-    <div >
-
-      <BrowserRouter>    
+  return(
+    <div>
+      
+      <BrowserRouter>
         <Routes>
-          {/* tengo qye poner un * que es donde te lleva por defecto */}
-          <Route path='/' element={<Home />}/>
+          <Route path='/' element={<Home />} />
           <Route path='/register' element={<RegisterUser updateStatus={updateStatus} />}/>
-          <Route path='/login' element={<LoginUser updateStatus={updateStatus} />}/> 
+          <Route path='/login' element={<LoginUser updateStatus={updateStatus}/> }/>
 
           {/* Ruta para solicitar la recuperación de la contraseña (sin token) */}
           <Route path='/recuperate-password' element={<RecuperatePassword />}/>
 
-          {/* Ruta para cambiar la contrasña con el token */}
+          {/* Ruta para cambiar la contraseña con el token */}
           <Route path='/reset-password/:token' element={<ResetPassword />}/>
 
+          <Route element={<PrivateRoutes />} />
 
-          {/* Ruta para restrablecer la contraseña usando el token */}
-          {/* <Route path="/resetPassword/:token" element={<RecuperatePassword />} /> */}
-   
-           <Route element={<PrivateRoutes/>}>
-            <Route path='/profile' element={<UserProfile name={name} lastName={lastName} role={role} />} />
-            <Route path='/update-user' element={<UpdateUserForm />} />
-          </Route>
-          <Route path='*' element={<Navigate to="/" />}/>
+            <Route path='profile' element={<UserProfile name={name} lastName={lastName} role = {role} />}/>
+            <Route path='/update-user' element = {< UpdateUserForm/>}/>
 
+          <Route />
+          <Route path='*' element= {<Navigate to="/"/>}/>
         </Routes>
-      </ BrowserRouter>
+
+      </BrowserRouter>
     </div>
-   
   )
+
 }
 
-
-
-
 export default App
+
 
 
 

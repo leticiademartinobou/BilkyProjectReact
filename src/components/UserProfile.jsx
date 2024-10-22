@@ -100,18 +100,20 @@ return (
         <ul>
           {documents.map((document) => (
             <li key={document._id}>
-              {document.name ? document.name : "No name"} - {document.description ? document.description : "No description"}
+              {document.name ? document.name: "documento sin nombre"} - {document.description ? document.description: "documento sin ninguna description"}
+
             </li>
           ))}
         </ul>
       ) : (
-        <p>No documents available</p>
+        <p>El usuario no tiene ningún documento</p>
       )}
       {role === "admin" && <UpdateUserForm />}
-    </div>
-  </div>
+
+      </div>
+      </div>
 );
 };
 
-
 export default UserProfile
+
