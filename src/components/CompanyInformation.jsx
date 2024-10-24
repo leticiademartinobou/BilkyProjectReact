@@ -21,9 +21,20 @@ const CompanyInformation = () => {
                 </div>
             </nav>
 
-            <p>Todo lo que necesita tu asesoría en un portal</p>
-            <p>Principales ventajas del Portal Asesor </p>
-            <p>El programa para asesorías que controla y gestiona el flujo de trabajo y documentación con todos los clientes de forma automática y sencilla.</p>
+            <header className="w-full h-[650px] flex items-center justify-center bg-blue-900">
+                <div className=" w-full min-w-full text-center">
+                    <p className="text-4xl text-gray-100 md:text-5xl font-bold">Todo lo que necesita tu </p>
+                    <p className="text-4xl text-gray-100 md:text-5xl font-bold"><span className="text-green-200">asesoría</span> en un portal</p>
+
+                </div>
+            </header>
+
+            <section className="py-12 text-center">
+                <h2 className="text-2xl font-bold text-gray-600">Principales <span className="text-blue-600">ventajas</span> del Portal Asesor</h2>
+                <p className="text-gray-600 mt-4 max-w-4xl mx-auto">El programa para asesorías que controla y gestiona el flujo de trabajo y documentación con todos los clientes de forma automática y sencilla.</p>
+
+            </section>
+
         </div>
     );
 
