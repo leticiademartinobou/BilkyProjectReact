@@ -10,6 +10,55 @@ export const RegisterUser = ( { updateStatus }) => {
   const [message, setMessage] = useState("") // aquí quiero manejar el mensaje de respuesta cuando me registre o no
   const navigate = useNavigate(); // hago esto para inicializar useNavigate aquí
 
+  // función para comprobar que el NIF es correcto
+
+  const validateSpanishId = (id) => {
+
+    const DNI_REGEX = /^(\d{8})([A-Z])$/;
+    const CIF_REGEX = /^([ABCDEFGHJKLMNPQRSUVW])(\d{7})([0-9A-J])$/;
+    const NIE_REGEX = /^[XYZ]\d{7,8}[A-Z]$/;
+
+    // VALIDACIÖN DNI -> si el NIF tiene 8 letras seguidas y una letra, es un DNI. Entonces calculo la letra y comparo
+
+    if(DNI_REGEX.test(id)) {
+
+      let number = parseInt(id.slice(0,8), 10);
+      let letter = id.slice(-1).toUpperCase();
+      const idLetters = "TRWAGMYFPDXBNJZSQVHLCKE";
+      let correctLetter = idLetters[number % 23]
+
+      return letter === correctLetter
+
+    }
+
+    // VALIDACIÖN CIF
+    // para simplificar asumo que cualquier CIF que pase el regex es válido
+
+    if(CIF_REGEX.test(id)) {
+
+      return true
+
+    }
+
+    // VALIDACIÓN NIE
+
+    if(NIE_REGEX.test(id)) {
+
+      const niePrefix = id.charAt(0);
+      const spanishIdCompare = id.replace(niePrefix, {X:0, Y:1, Z:2}[niePrefix]) // el nie siempre empieza por X,Y,Z y cambio esa letra inicial por un número
+      let number = parseInt(spanishIdCompare.slice(0,8), 10)
+      let letter = id.slice(-1).toUpperCase()
+      const idLetters = "TRWAGMYFPDXBNJZSQVHLCKE";
+      let correctLetter = idLetters[number % 23];
+      return letter === correctLetter; // aquí commparo la letra que ha puesto el usuario con la correcta y si es ok, es correcto
+
+    }
+
+    // si no cumple ninguna de estas validaciones, no es un id correcto 
+    return false
+
+  }
+
   // hago una función para manerjar el envío del formulario
 
   const onSubmit = (formUserData) => {
@@ -161,6 +210,22 @@ export const RegisterUser = ( { updateStatus }) => {
             </div>
 
             <div className="w-full md:w-1/2 px-4 mb-4">
+              <label className="block mb-2 text-xl font-medium text-gray-700">NIE, CIF o NIF</label>
+              <div className="flex items-center border border-blue-600 p-2 rounded">
+                <input
+                  className="flex-1 outline-none bg-transparent"
+                  type="text" 
+                  {...register("nif", {
+                    required: "El NIE, CIF o NIF es obligatorio",
+                    validate: (value) => validateSpanishId(value) || "El número de documento no es válido" // validación 
+                  })}
+                  placeholder="Escriba su NIE, CIF o NIF"
+                />
+              </div>
+              {errors.nif && <p className="text-red-500">{errors.nif.message}</p>}
+            </div>        
+
+            {/* <div className="w-full md:w-1/2 px-4 mb-4">
               <label className="block mb-2 text-xl font-medium text-gray-700">NIE o NIF</label>
               <div className="flex items-center border border-blue-600 p-2 rounded">
                 <input
@@ -176,7 +241,7 @@ export const RegisterUser = ( { updateStatus }) => {
               </div>
               {errors.nif && <p className="text-red-500">{errors.nif.message}</p>}
             </div>        
-
+ */}
 
             <div className="w-full md:w-1/2 px-4 mb-4">
               <label className="block mb-2 text-xl font-medium text-gray-700">Contraseña</label>
