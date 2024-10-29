@@ -80,19 +80,54 @@ export const RegisterUser = ( { updateStatus }) => {
       return fetchResponse.json(); // parseo la response a json
     })
     .then((serverData) => {
-      console.log("respuesta del servidor", serverData)
-      if(serverData.token) {
+      console.log("respuesta del servidor al realizar el register", serverData)
+      
+      if(serverData.success) {
 
         //Aquí lo que hago es que llamo a updateStatus para que guarde el token en el localStorage y actualice el estado
-        updateStatus(serverData.token)
-        navigate("/profile"); // si se ha hecho el register ok, ve al profile del user
-        setMessage("Usuario creado correctamente")
+
+        setMessage(serverData.message || "Usuario creado correctamente")
         console.log("esta es la info del mensaje",serverData.message)
         console.log(serverData)
+
+        // Llama a la ruta de login para obtener el token (generatedToken)
+        // aquí lo que quiero hacer es login tras el register
+
+        fetch(`${import.meta.env.VITE_APP_URL}/user/login`, {
+          method: "POST", 
+          headers: {
+            "Content-Type" : "application/json",
+          },
+          body: JSON.stringify({
+            email: formUserData.email, 
+            password: formUserData.password,
+          })
+        })
+          .then((loginResponse) => {
+            if(!loginResponse.ok) {
+              throw new Error (`HTTP error! status: ${loginResponse.status}`)
+            } return loginResponse.json();
+          })
+          .then((loginData) => {
+            // console.log("respuesta del servidor del login tras el registro", loginData)
+
+            if(loginData.generatedToken) {
+              console.log("token recibido", loginData.generatedToken)
+              updateStatus(loginData.generatedToken) // guarda el token y actualiza el estado 
+              navigate("/profile")
+            } else {
+              console.log("token no encontrado en la respuesta del login")
+              setMessage("error al obtener la información de usuario, inicie sesión de nuevo")
+            }
+        })  
+        .catch((error) => {
+          console.log("Error al intentar hacer login tras el register", error);
+          setMessage("error al iniciar sesión, vaya al login e intentélo de nuevo")
+        })
         
       } else if(serverData.message === "El email ya existe en la base de datos, utilice otro email o recupere su contraseña") {
         //respuesta si el usuario existe en la BBDD
-        // console.log(serverData.message)
+        console.log("mensaje de error del servidor", serverData.message)
 
         setMessage("El email ya existe en la base de datos, utilice otro email para registrarse")
       } else {
