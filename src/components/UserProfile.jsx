@@ -10,6 +10,9 @@ export const UserProfile = ({ name, lastName, role}) =>{
 const [documents, setDocuments] = useState([])
 const [error, setError] = useState(null)
 const [uploadFile, setUploadFile] = useState(null)
+const [email, setEmail] = useState("") // este es el estado dónde quiero almacenar el email
+const [title, setTitle] = useState("");
+const [formatError, setFormatError] = useState("") // quiero tener un estado para manejar formatos incorrectos
 const navigate = useNavigate()
 
 useEffect(() => {
@@ -98,15 +101,31 @@ const handleDelete = () => {
 }
 
 const handleFileChange = (e) => {
-  setUploadFile(e.target.files[0])
+
+  const file = e.target.files[0]
+  if(file && file.type !== "application/pdf") {
+    setFormatError("Sólo se pueden subir archivos en formato pdf")
+    setUploadFile(null)
+  } else {
+    setFormatError("")
+    setUploadFile(file)
+  }
+
 }
 
 const handleUpload = async () => {
 
+  if(!email || !uploadFile || !title) {
+    setError("El email no es válido también debe seleccionar un archivo pdf y definir su título")
+    return;
+  } 
+
+
   const formData = new FormData();
 
-  formData.append("file", selectedFile)
-  formData.append("userId", /* aquí hay que poner el userId del usuario al que se le asigna el documento*/)
+  formData.append("file", uploadFile)
+  formData.append("title", title)
+  formData.append("email", email) // añado el email dónde quiero subir el doc en FormData
 
   const token = localStorage.getItem("token")
 
@@ -120,11 +139,14 @@ const handleUpload = async () => {
     });
 
     const data = await response.json()
-    if(data.success) {
-      alert("Documento añadido a tu carpeta virtual")
-      // aquí quiero que se vea el doc
+    if(response.ok) {
+
+      alert("Documento añadido a la carpeta virtual del usuario seleccionado")
+      console.log("documento subido con éxito", data.message)
+      setDocuments([...documents, data.document]) // así añado un doc nuevo a los que ya tenga el usuarios
     } else {
       alert(data.message || "error al subir el documento, compruebe el documento (tamaño, extensión) y pruebe d nuevo")
+      console.log("error al subir el archivo",data.message)
     }
 
   } catch (error) {
@@ -132,25 +154,25 @@ const handleUpload = async () => {
     console.log("este es el error que hay al intentar subir el documento", error)
   }
 
-  if(role !== "admin") return
+  if(role !== "admin") return null;
 
 }
   
 return (
   <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg bg-gray-100">
-    <h1 className="text-3xl md:text-5xl font-bold text-center break-words mb-4">
+    <h1 className="text-3xl md:text-5xl font-bold text-center mb-4">
       Hola, {name} {lastName} tu rol es {role}
     </h1>
-    <p className="mt-4 text-center text-black">Welcome, to your profile page!</p>
+    <p className="mt-4 text-2xl text-center text-black">Welcome, to your profile page!</p>
     <div className='mt-4'>
       <h2 className='text-2xl font-bold'>Documents</h2>
       {error && <p className='text-red-500'>{error}</p>}
       {Array.isArray(documents) && documents.length > 0 ? (
         <ul>
           {documents.map((document) => (
-            <li key={document._id}>
-              {document.name ? document.name: "documento sin nombre"} - {document.description ? document.description: "documento sin ninguna description"}
-
+            <li key={document?._id}>
+              {document?.name ? document.name : "documento sin nombre"} - {document?.description ? document.description: "documento sin ninguna description"}
+            {/* pongo document? por si el documento no tiene los campos nombre o description que no me dé error */}
             </li>
           ))}
         </ul>
@@ -159,12 +181,46 @@ return (
       )}
 
       {role === "admin" && (
-        <div className='mt-6 flex flex-col items-center gap-4'>
-          <input type='file' onChange={handleFileChange}/>
-          <button onClick={handleUpload} className='bg-blue-600 text-white px-4 py-2 mt-2 rounded'>
-            Upload Documento
-          </button>
+        <div className='mb-6'>
+          <div className='max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-6'>
+          <h2 className='text-2xl font-bold mb-4 text-center'>Subir documento</h2>
+
+            <div className='mb-4'>
+
+              <input 
+                type='text'
+                placeholder='Escriba el título del documento'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className='w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black'
+              />
+            </div>
+
+
+            <div className='mb-4'>
+
+              <input 
+                type='email'
+                placeholder='Escriba el email del usuario al que quiere subir el documento'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className='w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black'
+              />
+            </div>
+
+            <div className='mb-4'>
+              <input type='file' accept='.pdf' onChange={handleFileChange} className='w-full'/>
+              {formatError && <p className='text-red-500'>{formatError}</p>}
+
+            </div>
+
+            <button onClick={handleUpload} className='w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200'>
+              Subir Documento (sólo PDF)
+            </button>
+          </div>
+
         </div>
+
       )}
 
       {role === "admin" && <UpdateUserForm />}
