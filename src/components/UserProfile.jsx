@@ -8,10 +8,12 @@ export const UserProfile = ({ name, lastName, role}) =>{
  
 
 const [documents, setDocuments] = useState([])
+const [documentId, setDocumentId] = useState("")
 const [error, setError] = useState(null)
 const [uploadFile, setUploadFile] = useState(null)
 const [email, setEmail] = useState("") // este es el estado dónde quiero almacenar el email
 const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
 const [formatError, setFormatError] = useState("") // quiero tener un estado para manejar formatos incorrectos
 const navigate = useNavigate()
 
@@ -54,8 +56,8 @@ useEffect(() => {
         }
     
       if (data.success) {
-        if (Array.isArray(data.data.documents)) {
-          setDocuments(data.data.documents);
+        if (Array.isArray(data.data.documents)) { // se puede quedar esta línea?
+          setDocuments(data.data.documents ||[]); // si data.data.documents es undefined o null se utiliza un array vacío. así me aseguro que setDocuments siempre sea un array
           console.log("Documentos del usuario recibidos", data.data.documents);
         } else {
           console.log("Los documentos no tienen el formato esperado", data.data.documents);
@@ -125,7 +127,8 @@ const handleUpload = async () => {
 
   formData.append("file", uploadFile)
   formData.append("title", title)
-  formData.append("email", email) // añado el email dónde quiero subir el doc en FormData
+  formData.append("description", description)
+  formData.append("userEmail", email) // añado el email dónde quiero subir el doc en FormData. userEmail es cómo lo tengo puesto en el backend
 
   const token = localStorage.getItem("token")
 
@@ -141,9 +144,9 @@ const handleUpload = async () => {
     const data = await response.json()
     if(response.ok) {
 
+      setDocuments([...documents, data.data]) // así añado un doc nuevo a los que ya tenga el usuarios. Añado el doc al estado de documentos
       alert("Documento añadido a la carpeta virtual del usuario seleccionado")
       console.log("documento subido con éxito", data.message)
-      setDocuments([...documents, data.document]) // así añado un doc nuevo a los que ya tenga el usuarios
     } else {
       alert(data.message || "error al subir el documento, compruebe el documento (tamaño, extensión) y pruebe d nuevo")
       console.log("error al subir el archivo",data.message)
@@ -156,6 +159,37 @@ const handleUpload = async () => {
 
   if(role !== "admin") return null;
 
+}
+
+const deleteDocument = async (e) => {
+
+  e.preventDefault(); // con esto evito que la página se cargue
+
+  try {
+
+    const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/deleteDocument`, {
+      method: "DELETE", 
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({id: documentId }) // envío el id del doc en el body
+    });
+
+    const data = await response.json()
+    if(data.success) {
+      console.log(data.message)
+      //actualizo el array de docs eliminando el doc con el ID proporcionado
+      setDocuments((previousDocuments) => previousDocuments.filter(document => document._id !== documentId))
+      alert("documento eliminado con éxito")
+    } else {
+      console.log(data.message)
+    }
+    
+  } catch (error) {
+    console.log("este es el error al eliminar el documento", error)
+    alert(error)
+  }
 }
   
 return (
@@ -171,7 +205,7 @@ return (
         <ul>
           {documents.map((document) => (
             <li key={document?._id}>
-              {document?.name ? document.name : "documento sin nombre"} - {document?.description ? document.description: "documento sin ninguna description"}
+              {document?.title || "documento sin título"} - {document?.description || "documento sin ninguna description"}
             {/* pongo document? por si el documento no tiene los campos nombre o description que no me dé error */}
             </li>
           ))}
@@ -187,6 +221,8 @@ return (
 
             <div className='mb-4'>
 
+            <div className='mb-4'>
+
               <input 
                 type='text'
                 placeholder='Escriba el título del documento'
@@ -196,6 +232,14 @@ return (
               />
             </div>
 
+              <input 
+                type='text'
+                placeholder='Escriba la descripción del documento'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className='w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black'
+              />
+            </div>
 
             <div className='mb-4'>
 
@@ -207,6 +251,7 @@ return (
                 className='w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black'
               />
             </div>
+
 
             <div className='mb-4'>
               <input type='file' accept='.pdf' onChange={handleFileChange} className='w-full'/>
@@ -221,6 +266,14 @@ return (
 
         </div>
 
+      )}
+
+      {role === "admin" && (
+        <div className='mb-6'>
+          <div className='max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-6'>
+            <h2 className='text-2xl font-bold mb-4 text-center'>Eliminar documento</h2>
+          </div>
+        </div>
       )}
 
       {role === "admin" && <UpdateUserForm />}
