@@ -11,6 +11,7 @@ const [documents, setDocuments] = useState([])
 const [documentId, setDocumentId] = useState("")
 const [message, setMessage] = useState("")
 const [error, setError] = useState(null)
+const [success, setSuccess] = useState("")
 const [uploadFile, setUploadFile] = useState(null)
 const [searchEmail, setSearchEmail] = useState("")
 const [uploadEmail, setUploadEmail] = useState("")
@@ -21,6 +22,8 @@ const [formatError, setFormatError] = useState("") // quiero tener un estado par
 const navigate = useNavigate()
 
 useEffect(() => {
+
+  // función para obtener el perfil de usuario y sus documentos
 
   const fetchUserProfile = async () => {
   
@@ -62,7 +65,6 @@ useEffect(() => {
         if (Array.isArray(data.data.documents)) { // se puede quedar esta línea?
           console.log("ver si document._id está disponible", data.data.documents)
           setDocuments(data.data.documents ||[]); // si data.data.documents es undefined o null se utiliza un array vacío. así me aseguro que setDocuments siempre sea un array
-          console.log("Documentos del usuario recibidos", data.data.documents);
 
         } else {
           console.log("Los documentos no tienen el formato esperado", data.data.documents);
@@ -98,7 +100,7 @@ useEffect(() => {
         method: "GET",
         headers: {
           "Content-Type" : "application/json", 
-          Authorization: `Bearer ${token}`      
+          "Authorization": `Bearer ${token}`      
         }
       });
 
@@ -129,7 +131,7 @@ const handleUpdate = async () => {
   method: "PUT", 
   headers: {
     "Content-Type" : "application/json", 
-    Authorization: `Bearer ${token}`,
+    "Authorization": `Bearer ${token}`,
   },
   body: JSON.stringify({email, newEmail, password }),
  });
@@ -145,9 +147,9 @@ const handleUpdate = async () => {
  }
 }
 
-const handleDelete = () => {
- // poner la lógica del delete
-}
+
+
+// utilizo está función para verificar que es un PDF
 
 const handleFileChange = (e) => {
 
@@ -163,6 +165,8 @@ const handleFileChange = (e) => {
 }
 
 const handleUpload = async () => {
+
+  if(role !== "admin") return null;
 
   if(!uploadEmail || !uploadFile || !title) {
     setError("El email no es válido también debe seleccionar un archivo pdf y definir su título")
@@ -183,12 +187,13 @@ const handleUpload = async () => {
     const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/upload`, {
       method: "POST", 
       headers: {
-        Authorization: `Bearer ${token}`
+        "Authorization": `Bearer ${token}`
       },
       body: formData
     });
 
     const data = await response.json()
+
     if(response.ok) {
 
       setDocuments([...documents, data.data]) // así añado un doc nuevo a los que ya tenga el usuarios. Añado el doc al estado de documentos
@@ -205,43 +210,79 @@ const handleUpload = async () => {
     console.log("este es el error que hay al intentar subir el documento", error)
   }
 
-  if(role !== "admin") return null;
-
 }
 
-const deleteDocument = async () => {
+// función para eliminar un documento
+
+const handleDelete = async (documentId) => {
+  
+  try {
+    const response = await deleteDocument(documentId)
+
+    if(response.success) {
+      setDocuments(documents.filter(document => document._id !== documentId))
+      setMessage("documento eliminado correctamente")
+    } else {
+      setError("Error al eliminar el documento")
+    }
+  } catch (error) {
+    setError("error al eliminar el documento")
+  }
+
+ }
+
+ // llamada a la API para eliminar el documento
+
+const deleteDocument = async (documentId) => {
 
   const token = localStorage.getItem("token")
 
+  if(!token) {
+    console.log("Token no encontrado")
 
-  try {
-
-    const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/deleteDocument`, {
-      method: "DELETE", 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({id: documentId }) // envío el id del doc en el body
-    });
-
-    const data = await response.json()
-    if(data.success) {
-      console.log(data.message)
-      //actualizo el array de docs eliminando el doc con el ID proporcionado
-      setDocuments((previousDocuments) => previousDocuments.filter(document => document._id !== documentId))
-      alert("documento eliminado con éxito")
-    } else {
-      console.log(data.message)
-      alert("No se ha podido eliminar el documento")
-    }
-    
-  } catch (error) {
-    console.log("este es el error al eliminar el documento", error)
-    alert(error)
-  }
-}
+    throw new Error("Token no encontrado, haga el log in de nuevo")
   
+  }
+
+  const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
+    method: "DELETE", 
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+  })
+  return response.data;
+}
+//   try {
+
+//     const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
+//       method: "DELETE", 
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Authorization": `Bearer ${token}`
+//       },
+//       body: JSON.stringify({id: documentId }) // envío el id del doc en el body
+//     });
+
+//     const data = await response.json()
+    
+//     if(data.success) {
+//       console.log(data.message)
+//       //actualizo el array de docs eliminando el doc con el ID proporcionado
+//       setDocuments((previousDocuments) => previousDocuments.filter(document => document._id !== documentId))
+//       alert("documento eliminado con éxito")
+//     } else {
+//       console.log(data.message)
+//       alert("No se ha podido eliminar el documento")
+//     }
+    
+//   } catch (error) {
+//     console.log("este es el error al eliminar el documento", error)
+//     alert(error)
+//   }
+//   return response.data
+// } 
+
 return (
   <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg bg-gray-100">
     {/* Link de Home */}
@@ -259,13 +300,13 @@ return (
     <div className='mt-4'>
       <h2 className='text-2xl font-bold mb-4'>Documentos de {searchEmail}</h2>
       {message && <p className='text-red-500'>{message}</p>}
+      {error && <p className='text-red-500'>{error}</p>}
 
-      {/* {error && <p className='text-red-500'>{error}</p>} */}
       {Array.isArray(documents) && documents.length > 0 ? (
         <ul>
           {documents.map((document) => (
-            <li key={document?._id}>
-              Document ID: {document?._id || "ID no disponible"} - {document?.title || "documento sin título"} - {document?.description || "documento sin ninguna description"}
+            <li key={document._id}>
+              <strong>Document ID:</strong> {document._id || "ID no disponible"} - <strong>Título: </strong>{document.title || "documento sin título"} - <strong>Descripción: </strong>{document.description || "documento sin ninguna description"}
             {/* pongo document? por si el documento no tiene los campos nombre o description que no me dé error */}
             </li>
           ))}
