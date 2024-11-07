@@ -305,8 +305,8 @@ return (
       {Array.isArray(documents) && documents.length > 0 ? (
         <ul>
           {documents.map((document) => (
-            <li key={document._id}>
-              <strong>Document ID:</strong> {document._id || "ID no disponible"} - <strong>Título: </strong>{document.title || "documento sin título"} - <strong>Descripción: </strong>{document.description || "documento sin ninguna description"}
+            <li key={document?._id}>
+              <strong>Document ID:</strong> {document?._id || "ID no disponible"} - <strong>Título: </strong>{document?.title || "documento sin título"} - <strong>Descripción: </strong>{document?.description || "documento sin ninguna description"}
             {/* pongo document? por si el documento no tiene los campos nombre o description que no me dé error */}
             </li>
           ))}
