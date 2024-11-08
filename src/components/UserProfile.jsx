@@ -11,11 +11,12 @@ const [documents, setDocuments] = useState([])
 const [documentId, setDocumentId] = useState("")
 const [message, setMessage] = useState("")
 const [error, setError] = useState(null)
-const [success, setSuccess] = useState("")
 const [uploadFile, setUploadFile] = useState(null)
 const [searchEmail, setSearchEmail] = useState("")
 const [uploadEmail, setUploadEmail] = useState("")
-// const [email, setEmail] = useState("") // este es el estado dónde quiero almacenar el email
+const [emailToDelete, setEmailToDelete] = useState("") // este es el estado dónde quiero almacenar el email
+const [userFound, setUserFound] = useState(null) // estado para almacenar el email de findUser
+const [showWarning, setShowWarning] = useState(false) // estado para mostrar mensaje de emergencia
 const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
 const [formatError, setFormatError] = useState("") // quiero tener un estado para manejar formatos incorrectos
@@ -24,6 +25,8 @@ const navigate = useNavigate()
 useEffect(() => {
 
   // función para obtener el perfil de usuario y sus documentos
+  // verifico el token, si el token es válido  obtengo los documentos de usuario a través de un GET. 
+  // error 401-> si el token expira, me redirige al inicio
 
   const fetchUserProfile = async () => {
   
@@ -58,6 +61,9 @@ useEffect(() => {
           return navigate("/")
           }
 
+          // si la respuesta del fetch no es correcta lanzo un error, se interrumpe el procedimiento normal y salta al catch
+          // el mensaje que lanza es el el de data.message, si es undefined o null pongo el mensaje de la respuesta del fetch no es correcta
+
           throw new Error(data.message || 'La respuesta del fetch no es correcta');
         }
     
@@ -82,6 +88,9 @@ useEffect(() => {
   }
     fetchUserProfile()
   }, [navigate])
+
+  // Admin puede buscar los documentos de un usuario por su email
+  // Si el usuario existe actualizo el estado del UseState documents con los documentos que encuentre. Si no está el usuario me da el mensaje de error
 
   const handleSearch = async (e) => {
 
@@ -147,11 +156,75 @@ const handleUpdate = async () => {
  }
 }
 
+// lógica para borrar un usuario 
+
+// Busco el usuario
+
+const findUser = async () => {
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/findUserByEmail`, {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json"},
+      body: JSON.stringify( {email} )
+    });
+
+    const data = await response.json()
+
+    if(data.success) {
+      setUserFound(data.user)
+      setMessage("") // limpio los mensajes si va todo bien
+    } else {
+      setUserFound(null)
+      setMessage("Usuario no encontrado")
+    }
+
+  } catch (error) {
+    console.log("Error al buscar al usuario", error)
+    setMessage("Ha habido un error en la búsqueda del usuario")
+  }
+}
+
+// Con esta función eliminamos y enviamos el mensaje de confirmación
+
+const deleteUser = async () => {
+
+  try {
+
+    const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/delete`, {
+      method: "DELETE", 
+      headers: { "Content-Type": "application/json"}, 
+      body: JSON.stringify({email: userFound.email}) // envío el email del usuario encontrado
+    })
+
+    const data = await response.json()
+
+    if(data.success) {
+      setMessage("Usuario eliminado")
+      setUserFound(null) // con esto elimino el estaddo donde está el usuario encontrado 
+      setShowWarning(false) // No pongo ningún mensaje de aviso
+      setEmailToDelete("") // borro lo que tenga en el campo email
+    } else {
+      setMessage("Error al eliminar el usuario")
+    }
+    
+  } catch (error) {
+    console.log("este es el error que ha pasado al intentar eliminar el usuario", error)
+    setMessage("Hubo un error al intentar eliminar el usuario")
+  }
+}
 
 
-// utilizo está función para verificar que es un PDF
+
+
+// utilizo está función para verificar que es un PDF y que sólo se suban PDF  
 
 const handleFileChange = (e) => {
+
+  // e.target -> evento que es que el usuario selecciona un archivo
+  // e.target.files -> array de archivos seleccionados por el usuario
+  // e.target.files[0] -> sólo necesito el primer archivo porque sólo subo los docs de uno en uno
 
   const file = e.target.files[0]
   if(file && file.type !== "application/pdf") {
@@ -164,6 +237,8 @@ const handleFileChange = (e) => {
 
 }
 
+// si el usuario es admin, se puede subir un documento a un usuario específico. Los datos del archivo y el title se envían en FormData
+
 const handleUpload = async () => {
 
   if(role !== "admin") return null;
@@ -175,6 +250,11 @@ const handleUpload = async () => {
 
 
   const formData = new FormData();
+  // creo una instancia de FormData. Este es un objeto con un formato que se puede enviar a través de una solicitud POST de tipo multipart/form-data
+  // con formData creo un objeto vacío de FormData
+
+  //Aquí voy agregando datos a formData con el método append
+  // file, añado el archivo title, el title al documento description, añado la descrip. userEmail, añado el email asociado al doc.
 
   formData.append("file", uploadFile)
   formData.append("title", title)
@@ -187,9 +267,9 @@ const handleUpload = async () => {
     const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/upload`, {
       method: "POST", 
       headers: {
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}` // agrego el token para autentificar. No necesito añadir el Content-Type: multipart/form-data ya que fetch lo maneja automáticamente
       },
-      body: formData
+      body: formData // aquí incluyo el formData con el archivo y los datos.
     });
 
     const data = await response.json()
@@ -283,13 +363,22 @@ const deleteDocument = async (documentId) => {
 //   return response.data
 // } 
 
+
+// función para cerrar sesión 
+
+const logOff = () => {
+  localStorage.removeItem("token")
+  return navigate("/")
+}
+
 return (
   <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg bg-gray-100">
     {/* Link de Home */}
-    <div className='mb-4 flex items-center justify-between'>
-      <Link to = "/" className='text-blue-400 hover:underline text-lg'>
+    <div className='mb-4 flex items-center justify-end px-4 space-x-4'>
+      <Link to = "/" className='text-blue-500 hover:underline text-lg'>
          Home
       </Link>
+      <button onClick={logOff} className='bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200'>Log Off</button>
     </div>
     <h1 className="text-3xl md:text-5xl font-bold text-center mb-4">
       Hola, {name} {lastName} tu rol es {role}
@@ -421,7 +510,7 @@ return (
                   />
                 </div>
 
-              <button onClick={handleDelete} className='w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200'>
+              <button onClick={handleDelete} className='w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition duration-200'>
                 Eliminar documento
                 </button>
               </form>
@@ -430,7 +519,75 @@ return (
         </div>
       )}
 
+      
+
       {role === "admin" && <UpdateUserForm />}
+
+      {/* Aquí busco el usuario por su email */}
+
+      {role === "admin" && (
+        <div className='mb-6'>
+          <div className='max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-6'>
+            <h2 className='text-2xl font-bold mb-4 text-center'>Encontrar usuario a eliminar</h2>
+            <div className='mb-4'>
+                <div className='mb-4'>
+
+                  <input 
+                  type='email'
+                  placeholder='Escribe el email del usuario a eliminar'
+                  value={emailToDelete}
+                  onChange={(e) => setEmailToDelete(e.target.value)}
+                  className='w-full px-4 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-black'
+                  required
+
+                  />
+                </div>
+
+              <button onClick={findUser}  className='w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200'>
+                Buscar usuario
+                </button>
+            </div>
+            {/* Mostrar usuario encontrado */}
+
+            {userFound && (
+              <div className='mb-4'>
+                <p className='text-gray-700'>Usuario encontrado: <strong>{userFound.name}</strong></p>
+                <button
+                  onClick={()=> setShowWarning(true)}
+                  className='bg-red-500 text-white py-2 px-4 mt-2 rounded hover:bg-red-600 transition'
+                >
+                  Eliminar usuario
+                </button>
+              </div>
+            )}
+
+           {/* Mensaje de warning     */}
+
+           {showWarning && (
+              <div className='bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mt-4'>
+                <p>¿Está seguro de borrar al usuario <strong>{userFound.name}</strong></p>
+                <div className='mt-2 flex justify-end'>
+                  <button
+                    onClick={deleteUser}
+                    className='bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 transition mr-2'
+                  >
+                    Confirmar
+                  </button>
+
+                  <button onClick={()=> setShowWarning(false)}
+                    className='bg-gray-300 text-gray-700 py-1 px-3 rounded hover:bg-gray-400 transition'>
+                      Cancelar
+                  </button>
+                </div>
+              </div>
+           )}
+
+           {/* Mensajer de éxito o error al eliminar un usuario */}
+           {message && <p className='mt-4 text-center text-gray-600'>{message}</p>}
+
+          </div>
+        </div>
+      )}
 
       </div>
     </div>
