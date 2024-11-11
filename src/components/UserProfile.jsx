@@ -68,19 +68,14 @@ useEffect(() => {
         }
     
       if (data.success) {
-        if (Array.isArray(data.data.documents)) { // se puede quedar esta línea?
           console.log("ver si document._id está disponible", data.data.documents)
           setDocuments(data.data.documents ||[]); // si data.data.documents es undefined o null se utiliza un array vacío. así me aseguro que setDocuments siempre sea un array
-
+          setError("") // limpio errores antenriores 
         } else {
-          console.log("Los documentos no tienen el formato esperado", data.data.documents);
-          setError("Error en el formato de los documentos recibidos");
+          console.log("Error consiguiendo la información del usuario", data.data.documents);
+          setError(data.message || "Error consiguiendo la información del usuario");
         }
 
-      }else {
-        console.log("Error consiguiendo la información del usuario", data.message)
-        setError(data.message)
-      }
     } catch (error) {
       console.log("Este es el error del fetch", error)
       setError(error.message)
@@ -162,15 +157,20 @@ const handleUpdate = async () => {
 
 const findUser = async () => {
 
+  const emailToFind = searchEmail || emailToDelete
+
+  if(!emailToFind) return;
+
   try {
     const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/findUserByEmail`, {
       method: "POST", 
       headers: {
         "Content-Type": "application/json"},
-      body: JSON.stringify( {email} )
+      body: JSON.stringify( {email: emailToFind} )
     });
 
-    const data = await response.json()
+    const data = await response.json();
+    console.log("respuesta del backend en findUser fc", data)
 
     if(data.success) {
       setUserFound(data.user)
@@ -226,13 +226,17 @@ const handleFileChange = (e) => {
   // e.target.files -> array de archivos seleccionados por el usuario
   // e.target.files[0] -> sólo necesito el primer archivo porque sólo subo los docs de uno en uno
 
-  const file = e.target.files[0]
-  if(file && file.type !== "application/pdf") {
+  const file = e.target.files[0];
+
+  if (file && file.type !== "application/pdf") {
+
     setFormatError("Sólo se pueden subir archivos en formato pdf")
-    setUploadFile(null)
+    setUploadFile(null);
   } else {
+
     setFormatError("")
     setUploadFile(file)
+
   }
 
 }
@@ -240,6 +244,7 @@ const handleFileChange = (e) => {
 // si el usuario es admin, se puede subir un documento a un usuario específico. Los datos del archivo y el title se envían en FormData
 
 const handleUpload = async () => {
+  
 
   if(role !== "admin") return null;
 
@@ -295,44 +300,64 @@ const handleUpload = async () => {
 // función para eliminar un documento
 
 const handleDelete = async (documentId) => {
+
+  const token = localStorage.getItem("token")
+
+  if(!token) return;
   
   try {
-    const response = await deleteDocument(documentId)
+    const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
+      method:"DELETE", 
+      headers: {
+        "Content-Type" : "application/json",
+        "Authorization" : `Bearer ${token}`
+      },
+      body: JSON.stringify( {id: documentId })
+    })
 
-    if(response.success) {
-      setDocuments(documents.filter(document => document._id !== documentId))
+    const data = await response.json()
+
+    if(response.ok) {
+      setDocuments((previousDocuments) => previousDocuments.filter((document)=> document._id !== documentId))
       setMessage("documento eliminado correctamente")
+
     } else {
       setError("Error al eliminar el documento")
     }
   } catch (error) {
     setError("error al eliminar el documento")
   }
-
  }
 
  // llamada a la API para eliminar el documento
 
-const deleteDocument = async (documentId) => {
+// const deleteDocument = async (documentId) => {
 
-  const token = localStorage.getItem("token")
+//   const token = localStorage.getItem("token")
 
-  if(!token) {
-    console.log("Token no encontrado")
+//   if(!token) {
+//     console.log("Token no encontrado")
 
-    throw new Error("Token no encontrado, haga el log in de nuevo")
+//     throw new Error("Token no encontrado, haga el log in de nuevo")
   
-  }
+//   }
 
-  const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
-    method: "DELETE", 
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-  })
-  return response.data;
-}
+//   const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
+//     method: "DELETE", 
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Authorization": `Bearer ${token}`
+//     },
+//     body: JSON.stringify({ id: documentId })
+//   })
+  
+//   const data = await response.json()
+
+//   if(!response.ok) throw new Error(data.message || "Error al eliminar el documento")
+  
+//     return data;
+
+// }
 //   try {
 
 //     const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
@@ -496,7 +521,7 @@ return (
           <div className='max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-6'>
             <h2 className='text-2xl font-bold mb-4 text-center'>Eliminar documento</h2>
             <div className='mb-4'>
-              <form onSubmit={deleteDocument}>
+              <form onSubmit={handleDelete}>
                 <div className='mb-4'>
 
                   <input 
@@ -584,6 +609,7 @@ return (
 
            {/* Mensajer de éxito o error al eliminar un usuario */}
            {message && <p className='mt-4 text-center text-gray-600'>{message}</p>}
+           {error && <p className='text-red-500'>{error}</p>}
 
           </div>
         </div>
