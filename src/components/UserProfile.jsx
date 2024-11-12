@@ -300,10 +300,13 @@ const handleUpload = async () => {
 // función para eliminar un documento
 
 const handleDelete = async (documentId) => {
-
+  console.log("Vas a borrar el documentId =>", documentId)
   const token = localStorage.getItem("token")
 
-  if(!token) return;
+  if(!token) {
+    setError("El token no se ha encontrado, por favor haga log in de nuevo")
+    return 
+  }
   
   try {
     const response = await fetch(`${import.meta.env.VITE_APP_URL}/document/delete`, {
@@ -318,14 +321,16 @@ const handleDelete = async (documentId) => {
     const data = await response.json()
 
     if(response.ok) {
+      console.log("Se ha eliminado el siguiente documento", documentId)
       setDocuments((previousDocuments) => previousDocuments.filter((document)=> document._id !== documentId))
       setMessage("documento eliminado correctamente")
 
     } else {
-      setError("Error al eliminar el documento")
+      setError(data.message || "Error al eliminar el documento")
     }
   } catch (error) {
     setError("error al eliminar el documento")
+    console.log("error al eliminar el documento", error)
   }
  }
 
@@ -516,12 +521,14 @@ return (
 
       )}
 
+      {/* Formulario para eliminar documentos */}
+
       {role === "admin" && (
         <div className='mb-6'>
           <div className='max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg mt-6'>
             <h2 className='text-2xl font-bold mb-4 text-center'>Eliminar documento</h2>
             <div className='mb-4'>
-              <form onSubmit={handleDelete}>
+              <form onSubmit= {(e)=>{e.preventDefault(); handleDelete(documentId)}}>
                 <div className='mb-4'>
 
                   <input 
@@ -534,10 +541,12 @@ return (
 
                   />
                 </div>
-
-              <button onClick={handleDelete} className='w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition duration-200'>
-                Eliminar documento
-                </button>
+                  <button 
+                    type='submit'
+                    className='w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition duration-200' 
+                  >
+                    Eliminar documento
+                    </button>
               </form>
             </div>
           </div>
