@@ -315,7 +315,7 @@ const handleDelete = async (documentId) => {
         "Content-Type" : "application/json",
         "Authorization" : `Bearer ${token}`
       },
-      body: JSON.stringify( {id: documentId })
+      body: JSON.stringify( {documentId: documentId })
     })
 
     const data = await response.json()
