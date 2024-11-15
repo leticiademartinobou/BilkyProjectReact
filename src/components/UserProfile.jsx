@@ -91,6 +91,8 @@ useEffect(() => {
 
     e.preventDefault();
 
+    setError("") // limpio los errores anteriores si los hay
+
     const token = localStorage.getItem('token'); 
 
     if(!token) {
@@ -159,7 +161,12 @@ const findUser = async () => {
 
   const emailToFind = searchEmail || emailToDelete
 
-  if(!emailToFind) return;
+  if(!emailToFind) {
+    console.log("No hay email que buscar")
+    return;
+  }
+  
+  console.log("Email que vas a buscar para eliminar", emailToFind)
 
   try {
     const response = await fetch(`${import.meta.env.VITE_APP_URL}/user/findUserByEmail`, {
@@ -168,6 +175,7 @@ const findUser = async () => {
         "Content-Type": "application/json"},
       body: JSON.stringify( {email: emailToFind} )
     });
+
 
     const data = await response.json();
     console.log("respuesta del backend en findUser fc", data)
@@ -199,6 +207,8 @@ const deleteUser = async () => {
     })
 
     const data = await response.json()
+    console.log("respuesta del backend: ", data)
+    console.log("email para eliminar", userFound.email)
 
     if(data.success) {
       setMessage("Usuario eliminado")
@@ -581,6 +591,7 @@ return (
                 Buscar usuario
                 </button>
             </div>
+
             {/* Mostrar usuario encontrado */}
 
             {userFound && (
